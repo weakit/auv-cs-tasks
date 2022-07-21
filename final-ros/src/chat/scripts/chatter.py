@@ -4,9 +4,9 @@ from datetime import datetime as dt
 import rospy
 from chat.msg import Message
 
-def spawn_listener(handle: str):
+def spawn_listener(handle: str, authorId: int):
     def listener(data: Message):
-        if data.author == handle: return
+        if data.author == handle and data.authorId == authorId: return
         time = dt.utcfromtimestamp(data.time).strftime("%I:%M:%S %p")
         print(f'\r[{time}] {data.author}#{data.authorId}: {data.message}' + '\nchat> ', end='')
     return listener
@@ -15,7 +15,7 @@ def node():
     handle = input("Enter a chat handle: ")
     authorId = randint(1000, 9999)
 
-    subcriber = rospy.Subscriber('chat', Message, spawn_listener(handle))
+    subcriber = rospy.Subscriber('chat', Message, spawn_listener(handle, authorId))
     publisher = rospy.Publisher('chat', Message, queue_size=10)
     print(f"\nConnecting to chat topic on {subcriber.resolved_name} as {handle}#{authorId}.\n")
 
